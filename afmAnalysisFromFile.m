@@ -1,4 +1,4 @@
-function [beta] = afmAnalysisFromFile(filename)
+function [betaAmp, betaPhase] = afmAnalysisFromFile(filename)
 
 % Read in Data File
 data = dlmread(filename, '\t');
@@ -9,24 +9,34 @@ frequency = transpose(data(:,1));
 % Amplitude <=> y
 amplitude = transpose(data(:,2));
 % Phase <=> phi
-phase = data(:,3);
+phase = transpose(data(:,3));
 
-% Declare fit model (Lorentzian)
+% Declare amplitude fit model (Lorentzian)
 lorentzianModel = @(b,x) (b(1) + b(2)./((x - b(3)).^2 + b(4)));
+% Declare phase fit model (arctan)
+phaseModel = @(b,x) (atan((((x .* b(1))./(b(2)))./(b(1).^2 - x.^2))));
 
 % Declare initial fit data
-beta0 = [min(amplitude) 10 300000 10];
+beta0Amp = [min(amplitude) 10 300000 10];
+beta0Phase = [30000 450];
 
 % Set Options for Fitting
 % Increase max iterations for better fit
 options.MaxIter = 15000;
+options.TolX = 1e-15;
+options.TolY = 1e-15;
 
-% Generate fit
-beta = nlinfit(frequency, amplitude, lorentzianModel, beta0, options);
+% Generate fit for frequency/amplitude
+betaAmp = nlinfit(frequency, amplitude, lorentzianModel, beta0Amp, options);
 % Make fitted function from regression coefficients
-fittedFunction = @(x) (beta(1) + beta(2)./((x - beta(3)).^2 + beta(4)));
+fittedAmp = @(x) (betaAmp(1) + betaAmp(2)./((x - betaAmp(3)).^2 + betaAmp(4)));
 
-% Generate figure for first plot
+% Generate fit for frequency/phase
+betaPhase = nlinfit(frequency, phase, phaseModel, beta0Phase, options);
+% Make fitted function from regression coefficients
+fittedPhase = @(b,x) (atan((((x .* betaPhase(1))./(betaPhase(2)))./(betaPhase(1).^2 - x.^2))));
+
+% Generate amplitude plot
 figure
 hold on
 
@@ -34,7 +44,24 @@ hold on
 plot(frequency, amplitude);
 
 % Plot fit
-fplot(fittedFunction, [min(frequency), max(frequency)], 'red');
+fplot(fittedAmp, [min(frequency), max(frequency)], 'red');
+
+% Set graph properties
+legend('Experimental Data', 'Fitted Function');
+xlabel('Frequency (Hz)');
+ylabel('Amplitude (V)');
+
+hold off
+
+% Generate phase plot
+figure
+hold on
+
+% Plot data
+plot(phase, amplitude);
+
+% Plot fit
+fplot(fittedPhase, [min(frequency), max(frequency)], 'red');
 
 % Set graph properties
 legend('Experimental Data', 'Fitted Function');
