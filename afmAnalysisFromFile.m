@@ -23,7 +23,6 @@ options.MaxIter = 15000;
 
 % Generate fit
 beta = nlinfit(frequency, amplitude, lorentzianModel, beta0, options);
-
 % Make fitted function from regression coefficients
 fittedFunction = @(x) (beta(1) + beta(2)./((x - beta(3)).^2 + beta(4)));
 
@@ -35,7 +34,12 @@ hold on
 plot(frequency, amplitude);
 
 % Plot fit
-fplot(fittedFunction, [min(frequency), max(frequency)]);
+fplot(fittedFunction, [min(frequency), max(frequency)], 'red');
+
+% Set graph properties
+legend('Experimental Data', 'Fitted Function');
+xlabel('Frequency (Hz)');
+ylabel('Amplitude (V)');
 
 hold off
 
