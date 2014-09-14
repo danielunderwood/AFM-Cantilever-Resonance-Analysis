@@ -15,10 +15,14 @@ phase = data(:,3);
 lorentzianModel = @(b,x) (b(1) + b(2)./((x - b(3)).^2 + b(4)));
 
 % Declare initial fit data
-beta0 = [0.1 10 300000 10];
+beta0 = [min(amplitude) 10 300000 10];
+
+% Set Options for Fitting
+% Increase max iterations for better fit
+options.MaxIter = 15000;
 
 % Generate fit
-beta = nlinfit(frequency, amplitude, lorentzianModel, beta0);
+beta = nlinfit(frequency, amplitude, lorentzianModel, beta0, options);
 
 % Make fitted function from regression coefficients
 fittedFunction = @(x) (beta(1) + beta(2)./((x - beta(3)).^2 + beta(4)));
@@ -31,7 +35,7 @@ hold on
 plot(frequency, amplitude);
 
 % Plot fit
-fplot(fittedFunction, [0, 2000]);
+fplot(fittedFunction, [min(frequency), max(frequency)]);
 
 hold off
 
