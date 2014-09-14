@@ -58,14 +58,14 @@ figure
 hold on
 
 % Plot data
-plot(phase, amplitude);
+plot(frequency, phase);
 
 % Plot fit
 fplot(fittedPhase, [min(frequency), max(frequency)], 'red');
 
 % Set graph properties
 legend('Experimental Data', 'Fitted Function');
-xlabel('Frequency (Hz)');
+xlabel('Phase (Radians)');
 ylabel('Amplitude (V)');
 
 hold off
