@@ -18,7 +18,7 @@ phaseModel = @(b,x) (((((x .* b(1))./(b(2)))./(b(1).^2 - x.^2))));
 
 % Declare initial fit data
 beta0Amp = [min(amplitude); 1; 30000; 1];
-beta0Phase = [30000; 450];
+beta0Phase = [300000; 450];
 
 % Set Options for Fitting
 % Increase max iterations for better fit
@@ -46,6 +46,7 @@ plot(frequency, amplitude);
 fplot(fittedAmp, [min(frequency), max(frequency)], 'red');
 
 % Set graph properties
+title('Amplitude vs. Frequency');
 legend('Experimental Data', 'Fitted Function');
 xlabel('Frequency (Hz)');
 ylabel('Amplitude (V)');
@@ -60,13 +61,26 @@ hold on
 plot(frequency, phase);
 
 % Plot fit
-fplot(fittedPhase, [min(frequency), max(frequency)], 'red');
+%2fplot(fittedPhase, [min(frequency), max(frequency)], 'red');
 
 % Set graph properties
+title('Phase vs. Frequency');
 legend('Experimental Data', 'Fitted Function');
-xlabel('Phase (Radians)');
-ylabel('Amplitude (V)');
+xlabel('Frequency(Hz)');
+ylabel('Phase (Radians)');
 
 hold off
+
+% Get and print resonant frequency
+[~ ,maxIndex] = max(amplitude);
+resFreq = frequency(maxIndex);
+fprintf('Resonant frequency for %s: %e\n', filename, resFreq);
+
+% Print Amplitude Fit Parameters
+fprintf('Amplitude Fit Parameters:\n');
+fprintf('A0: %e\n', betaAmp(1));
+fprintf('C1: %e\n', betaAmp(2));
+fprintf('Resonant Frequency from Fit: %e\n', betaAmp(3));
+fprintf('C2: %e\n', betaAmp(4));
 
 end
